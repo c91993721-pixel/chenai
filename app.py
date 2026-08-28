@@ -12,7 +12,18 @@ CTRADER_CLIENT_SECRET = os.environ.get("CTRADER_CLIENT_SECRET")
 CTRADER_REDIRECT_URI = "https://chenai-qry4.onrender.com/callback"
 CTRADER_ACCESS_TOKEN = os.environ.get("CTRADER_ACCESS_TOKEN")
 CTRADER_REFRESH_TOKEN = os.environ.get("CTRADER_REFRESH_TOKEN")
+@app.route("/ctrader-test")
+def ctrader_test():
+    if not CTRADER_ACCESS_TOKEN:
+        return jsonify({
+            "status": "error",
+            "message": "找不到 CTRADER_ACCESS_TOKEN"
+        }), 500
 
+    return jsonify({
+        "status": "ok",
+        "message": "cTrader Access Token 已成功由 Render 載入"
+    })
 
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
