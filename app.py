@@ -45,7 +45,46 @@ def ctrader_account_info():
         "client_id_loaded": bool(CTRADER_CLIENT_ID),
         "client_secret_loaded": bool(CTRADER_CLIENT_SECRET),
         "next_step": "connect_account_list"
-    })
+  })
+
+@app.route("/ctrader-accounts")
+def ctrader_accounts():
+    try:
+        import subprocess
+        import sys
+        import json
+
+        result = subprocess.run(
+            [sys.executable, "ctrader_accounts.py"],
+            capture_output=True,
+            text=True,
+            timeout=20
+        )
+
+        output = result.stdout.strip()
+
+        if not output:
+            return jsonify({
+                "status": "error",
+                "message": result.stderr.strip() or "沒有收到 cTrader 回應"
+            }), 500
+
+        # ctrader_accounts.py 最後一行會輸出 JSON
+        last_line = output.splitlines()[-1]
+
+        return jsonify(json.loads(last_line))
+
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            "status": "error",
+            "message": "cTrader 連線逾時"
+        }), 504
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
     price = round(random.uniform(4300, 4500), 2)
