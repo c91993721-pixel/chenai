@@ -37,7 +37,15 @@ def ctrader_test():
             "message": str(e)
         }), 500
     
-
+@app.route("/ctrader-account-info")
+def ctrader_account_info():
+    return jsonify({
+        "status": "ready",
+        "access_token_loaded": bool(CTRADER_ACCESS_TOKEN),
+        "client_id_loaded": bool(CTRADER_CLIENT_ID),
+        "client_secret_loaded": bool(CTRADER_CLIENT_SECRET),
+        "next_step": "connect_account_list"
+    })
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
     price = round(random.uniform(4300, 4500), 2)
