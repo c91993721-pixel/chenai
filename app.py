@@ -4,7 +4,9 @@ from datetime import datetime
 import random
 import os
 import requests
-
+from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPoints
+from ctrader_open_api.messages.OpenApiMessages_pb2 import *
+from twisted.internet import reactor
 app = Flask(__name__)
 
 CTRADER_CLIENT_ID = os.environ.get("CTRADER_CLIENT_ID")
@@ -14,16 +16,27 @@ CTRADER_ACCESS_TOKEN = os.environ.get("CTRADER_ACCESS_TOKEN")
 CTRADER_REFRESH_TOKEN = os.environ.get("CTRADER_REFRESH_TOKEN")
 @app.route("/ctrader-test")
 def ctrader_test():
-    if not CTRADER_ACCESS_TOKEN:
+    try:
+        sdk_loaded = all([
+            Client,
+            Protobuf,
+            TcpProtocol,
+            EndPoints
+        ])
+
+        return jsonify({
+            "status": "ok",
+            "token_loaded": bool(CTRADER_ACCESS_TOKEN),
+            "sdk_loaded": bool(sdk_loaded),
+            "message": "cTrader SDK 與 Access Token 均已載入"
+        })
+
+    except Exception as e:
         return jsonify({
             "status": "error",
-            "message": "找不到 CTRADER_ACCESS_TOKEN"
+            "message": str(e)
         }), 500
-
-    return jsonify({
-        "status": "ok",
-        "message": "cTrader Access Token 已成功由 Render 載入"
-    })
+    }
 
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
