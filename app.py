@@ -10,7 +10,8 @@ app = Flask(__name__)
 CTRADER_CLIENT_ID = os.environ.get("CTRADER_CLIENT_ID")
 CTRADER_CLIENT_SECRET = os.environ.get("CTRADER_CLIENT_SECRET")
 CTRADER_REDIRECT_URI = "https://chenai-qry4.onrender.com/callback"
-
+CTRADER_ACCESS_TOKEN = os.environ.get("CTRADER_ACCESS_TOKEN")
+CTRADER_REFRESH_TOKEN = os.environ.get("CTRADER_REFRESH_TOKEN")
 
 
 def get_signal():
