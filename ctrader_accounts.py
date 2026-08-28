@@ -17,9 +17,10 @@ ACCESS_TOKEN = os.environ.get("CTRADER_ACCESS_TOKEN")
 
 
 client = Client(
-    EndPoints.PROTOBUF_DEMO_HOST,
-    EndPoints.PROTOBUF_PORT,
+    "demo.ctraderapi.com",
+    5035,
     TcpProtocol
+)
 )
 
 
