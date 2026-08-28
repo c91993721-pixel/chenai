@@ -1,8 +1,17 @@
-from flask import Flask, jsonify
+
+from flask import Flask, jsonify, redirect, request
 from datetime import datetime
 import random
+import os
+import requests
 
 app = Flask(__name__)
+
+CTRADER_CLIENT_ID = os.environ.get("CTRADER_CLIENT_ID")
+CTRADER_CLIENT_SECRET = os.environ.get("CTRADER_CLIENT_SECRET")
+CTRADER_REDIRECT_URI = "https://chenai-qry4.onrender.com/callback"
+
+
 
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
@@ -36,7 +45,47 @@ def get_signal():
         "tp": tp,
         "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
+@app.route("/login")
+def ctrader_login():
+    auth_url = (
+        "https://id.ctrader.com/my/settings/openapi/grantingaccess/"
+        f"?client_id={CTRADER_CLIENT_ID}"
+        f"&redirect_uri={CTRADER_REDIRECT_URI}"
+        "&scope=trading"
+        "&product=web"
+    )
+    return redirect(auth_url)
 
+
+@app.route("/callback")
+def ctrader_callback():
+    code = request.args.get("code")
+
+    if not code:
+        return "cTrader 授權失敗：沒有收到 authorization code", 400
+
+    token_url = "https://openapi.ctrader.com/apps/token"
+
+    params = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": CTRADER_REDIRECT_URI,
+        "client_id": CTRADER_CLIENT_ID,
+        "client_secret": CTRADER_CLIENT_SECRET
+    }
+
+    response = requests.get(token_url, params=params, timeout=20)
+
+    if response.status_code != 200:
+        return f"cTrader Token 取得失敗：{response.text}", 400
+
+    token_data = response.json()
+
+    return jsonify({
+        "status": "connected",
+        "message": "cTrader 授權成功",
+        "expires_in": token_data.get("expiresIn")
+    })
 
 @app.route("/")
 def home():
