@@ -36,7 +36,7 @@ def ctrader_test():
             "status": "error",
             "message": str(e)
         }), 500
-    }
+    
 
 def get_signal():
     # 目前先使用模擬行情測試訊號系統
