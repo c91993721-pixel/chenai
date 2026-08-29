@@ -46,7 +46,34 @@ def ctrader_account_info():
         "client_secret_loaded": bool(CTRADER_CLIENT_SECRET),
         "next_step": "connect_account_list"
   })
+    })
 
+
+@app.route("/ctrader-port-test")
+def ctrader_port_test():
+    import socket
+
+    try:
+        sock = socket.create_connection(
+            ("demo.ctraderapi.com", 5035),
+            timeout=10
+        )
+        sock.close()
+
+        return jsonify({
+            "status": "ok",
+            "message": "Render 可以連線 cTrader 5035"
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route("/ctrader-accounts")
+def ctrader_accounts():
 @app.route("/ctrader-accounts")
 def ctrader_accounts():
     try:
