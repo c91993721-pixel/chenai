@@ -2,3 +2,4 @@ Flask
 gunicorn
 requests
 ctrader-open-api
+service_identity
