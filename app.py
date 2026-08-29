@@ -114,8 +114,8 @@ def ctrader_accounts():
             text=True,
             timeout=20
         )
-print(result.stdout, flush=True)
-print(result.stderr, flush=True)
+        print(result.stdout, flush=True)
+        print(result.stderr, flush=True)
         output = result.stdout.strip()
 
         if not output:
