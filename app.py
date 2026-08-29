@@ -358,6 +358,48 @@ def health():
         "service": "XAUUSD AI Signal"
     })
 
+@app.route("/ctrader-credential-test")
+def ctrader_credential_test():
+    try:
+        client_id = os.environ.get("CTRADER_CLIENT_ID")
+        client_secret = os.environ.get("CTRADER_CLIENT_SECRET")
+        refresh_token = os.environ.get("CTRADER_REFRESH_TOKEN")
 
+        if not client_id or not client_secret or not refresh_token:
+            return jsonify({
+                "status": "error",
+                "message": "Missing cTrader environment variables"
+            }), 500
+
+        response = requests.get(
+            "https://openapi.ctrader.com/apps/token",
+            params={
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+                "client_id": client_id,
+                "client_secret": client_secret
+            },
+            timeout=15
+        )
+
+        data = response.json()
+
+        if response.ok and "accessToken" in data:
+            return jsonify({
+                "status": "ok",
+                "message": "cTrader credentials accepted"
+            })
+
+        return jsonify({
+            "status": "error",
+            "http_status": response.status_code,
+            "ctrader_response": data
+        }), response.status_code
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
