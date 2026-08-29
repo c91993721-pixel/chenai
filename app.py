@@ -46,7 +46,7 @@ def ctrader_account_info():
         "client_secret_loaded": bool(CTRADER_CLIENT_SECRET),
         "next_step": "connect_account_list"
   })
-    })
+    
 
 
 @app.route("/ctrader-port-test")
