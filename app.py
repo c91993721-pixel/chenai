@@ -72,8 +72,7 @@ def ctrader_port_test():
         }), 500
 
 
-@app.route("/ctrader-accounts")
-def ctrader_accounts():
+
 @app.route("/ctrader-accounts")
 def ctrader_accounts():
     try:
