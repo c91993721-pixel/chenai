@@ -371,7 +371,7 @@ def ctrader_credential_test():
                 "message": "Missing cTrader environment variables"
             }), 500
 
-        response = requests.get(
+        response = requests.post(
             "https://openapi.ctrader.com/apps/token",
             params={
                 "grant_type": "refresh_token",
