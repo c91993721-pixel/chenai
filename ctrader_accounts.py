@@ -56,7 +56,14 @@ def disconnected(client, reason):
 
 
 def on_message(client, message):
+    extracted = Protobuf.extract(message)
 
+    print(
+        "cTrader message:",
+        message.payloadType,
+        str(extracted),
+        flush=True
+    )
     if message.payloadType == ProtoOAApplicationAuthRes().payloadType:
 
         request = ProtoOAGetAccountListByAccessTokenReq()
