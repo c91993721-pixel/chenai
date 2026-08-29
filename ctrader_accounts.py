@@ -47,8 +47,12 @@ def connected(client):
     deferred.addErrback(on_error)
 
 
-def disconnected(client, reason):
-    pass
+dedef disconnected(client, reason):
+    stop_with({
+        "status": "error",
+        "stage": "disconnected",
+        "message": str(reason)
+    })
 
 
 def on_message(client, message):
