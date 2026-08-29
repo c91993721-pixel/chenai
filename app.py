@@ -72,6 +72,34 @@ def ctrader_port_test():
         }), 500
 
 
+@app.route("/ctrader-ssl-test")
+def ctrader_ssl_test():
+    import socket
+    import ssl
+
+    try:
+        context = ssl.create_default_context()
+
+        with socket.create_connection(
+            ("demo.ctraderapi.com", 5035),
+            timeout=10
+        ) as sock:
+            with context.wrap_socket(
+                sock,
+                server_hostname="demo.ctraderapi.com"
+            ) as ssock:
+                return jsonify({
+                    "status": "ok",
+                    "message": "cTrader SSL/TLS 連線成功",
+                    "tls_version": ssock.version()
+                })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
 
 @app.route("/ctrader-accounts")
 def ctrader_accounts():
