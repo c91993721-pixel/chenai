@@ -401,5 +401,52 @@ def ctrader_credential_test():
             "status": "error",
             "message": str(e)
         }), 500
+    @app.route("/gold-test")
+def gold_test():
+    try:
+        api_key = os.environ.get("TWELVE_DATA_API_KEY")
+
+        if not api_key:
+            return jsonify({
+                "status": "error",
+                "message": "TWELVE_DATA_API_KEY missing"
+            }), 500
+
+        response = requests.get(
+            "https://api.twelvedata.com/time_series",
+            params={
+                "symbol": "XAU/USD",
+                "interval": "1min",
+                "outputsize": 5,
+                "apikey": api_key
+            },
+            timeout=15
+        )
+
+        data = response.json()
+
+        if "values" not in data:
+            return jsonify({
+                "status": "error",
+                "response": data
+            }), 500
+
+        latest = data["values"][0]
+
+        return jsonify({
+            "status": "ok",
+            "symbol": "XAU/USD",
+            "datetime": latest["datetime"],
+            "open": latest["open"],
+            "high": latest["high"],
+            "low": latest["low"],
+            "close": latest["close"]
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
