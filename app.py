@@ -714,6 +714,189 @@ def gold_signal():
             "status": "error",
             "message": str(e)
         }), 500
+@app.route("/dashboard")
+def dashboard():
+    return """
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHENAI Gold</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0d0d0d;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: auto;
+        }
+
+        .title {
+            font-size: 18px;
+            opacity: 0.7;
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .signal {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: #1b1b1b;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 17px;
+        }
+
+        .label {
+            opacity: 0.65;
+        }
+
+        .value {
+            font-weight: 700;
+        }
+
+        .tf {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tf-box {
+            background: #1b1b1b;
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+        }
+
+        .small {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="title">XAU / USD</div>
+    <div class="price" id="price">--</div>
+
+    <div class="signal" id="signal">載入中...</div>
+
+    <div class="card">
+        <div class="row">
+            <span class="label">信心度</span>
+            <span class="value" id="confidence">--</span>
+        </div>
+
+        <div class="row">
+            <span class="label">Entry</span>
+            <span class="value" id="entry">--</span>
+        </div>
+
+        <div class="row">
+            <span class="label">Stop Loss</span>
+            <span class="value" id="sl">--</span>
+        </div>
+
+        <div class="row">
+            <span class="label">TP1</span>
+            <span class="value" id="tp1">--</span>
+        </div>
+
+        <div class="row">
+            <span class="label">TP2</span>
+            <span class="value" id="tp2">--</span>
+        </div>
+
+        <div class="row">
+            <span class="label">TP3</span>
+            <span class="value" id="tp3">--</span>
+        </div>
+    </div>
+
+    <div class="tf">
+        <div class="tf-box">
+            <div class="small">M5</div>
+            <div id="m5">--</div>
+        </div>
+
+        <div class="tf-box">
+            <div class="small">M15</div>
+            <div id="m15">--</div>
+        </div>
+
+        <div class="tf-box">
+            <div class="small">H1</div>
+            <div id="h1">--</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+async function updateSignal() {
+    try {
+        const response = await fetch('/gold-signal');
+        const data = await response.json();
+
+        document.getElementById('price').textContent = data.price ?? '--';
+        document.getElementById('signal').textContent = data.signal ?? '--';
+        document.getElementById('confidence').textContent =
+            data.confidence !== undefined ? data.confidence + '%' : '--';
+
+        document.getElementById('entry').textContent = data.entry ?? '--';
+        document.getElementById('sl').textContent = data.stop_loss ?? '--';
+        document.getElementById('tp1').textContent = data.tp1 ?? '--';
+        document.getElementById('tp2').textContent = data.tp2 ?? '--';
+        document.getElementById('tp3').textContent = data.tp3 ?? '--';
+
+        if (data.timeframes) {
+            document.getElementById('m5').textContent =
+                data.timeframes.M5?.signal ?? '--';
+
+            document.getElementById('m15').textContent =
+                data.timeframes.M15?.signal ?? '--';
+
+            document.getElementById('h1').textContent =
+                data.timeframes.H1?.signal ?? '--';
+        }
+
+    } catch (error) {
+        document.getElementById('signal').textContent = '資料讀取失敗';
+    }
+}
+
+updateSignal();
+setInterval(updateSignal, 60000);
+</script>
+
+</body>
+</html>
+"""
 if __name__ == "__main__":
             app.run(host="0.0.0.0", port=10000)
     
