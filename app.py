@@ -401,7 +401,7 @@ def ctrader_credential_test():
             "status": "error",
             "message": str(e)
         }), 500
-    @app.route("/gold-test")
+@app.route("/gold-test")
 def gold_test():
     try:
         api_key = os.environ.get("TWELVE_DATA_API_KEY")
