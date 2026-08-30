@@ -698,6 +698,7 @@ def gold_signal():
         return jsonify({
             "status": "ok",
             "symbol": "XAU/USD",
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "price": current_price,
             "signal": final_signal,
             "entry": round(entry, 2),
@@ -803,7 +804,7 @@ def dashboard():
 
     <div class="title">XAU / USD</div>
     <div class="price" id="price">--</div>
-
+    <div class="small" id="updated">最後更新：--</div>
     <div class="signal" id="signal">載入中...</div>
 
     <div class="card">
@@ -864,6 +865,7 @@ async function updateSignal() {
         const data = await response.json();
 
         document.getElementById('price').textContent = data.price ?? '--';
+        document.getElementById('updated').textContent = '最後更新：' + (data.updated_at ?? '--');
         document.getElementById('signal').textContent = data.signal ?? '--';
         document.getElementById('confidence').textContent =
             data.confidence !== undefined ? data.confidence + '%' : '--';
