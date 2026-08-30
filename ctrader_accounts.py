@@ -50,16 +50,10 @@ def connected(client):
   
     print("SENDING APPLICATION AUTH", flush=True)
  
-    deferred = client.send(request)
-        deferred.addCallback(
-        lambda response: print(
-            "APPLICATION AUTH RESPONSE:",
-            str(Protobuf.extract(response)),
-            flush=True
-        )
-    )
-    deferred.addErrback(on_error)
-
+    
+        deferred = client.send(request)
+        deferred.addErrback(on_error)
+    
 
 def disconnected(client, reason):
     stop_with({
@@ -67,6 +61,8 @@ def disconnected(client, reason):
         "stage": "disconnected",
         "message": str(reason)
     })
+
+    
 
 
 def on_message(client, message):
