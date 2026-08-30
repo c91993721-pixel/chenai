@@ -652,16 +652,16 @@ def gold_signal():
                     "low": float(item["low"]),
                     "close": float(item["close"])
                 })
+             analyses[label] = analyse_timeframe(candles)
+             analyses[label]["atr"] = round(calc_atr(candles), 2)
 
-            analyses[label] = analyse_timeframe(candles)
-            analyses[label]["atr"] = round(calc_atr(candles), 2)
-            current_price = analyses["M5"]["price"]        
- 
-            weighted_score = (
-            analyses["M5"]["score"] +
-            analyses["M15"]["score"] * 2 +
-            analyses["H1"]["score"] * 3
-            )
+    current_price = analyses["M5"]["price"]
+
+    weighted_score = (
+        analyses["M5"]["score"] +
+        analyses["M15"]["score"] * 2 +
+        analyses["H1"]["score"] * 3
+    )
 
         if weighted_score >= 6:
             final_signal = "BUY"
