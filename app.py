@@ -645,16 +645,16 @@ def gold_signal():
 
             candles = []
 
-        for item in reversed(data["values"]):
-            candles.append({
-                "open": float(item["open"]),
-                "high": float(item["high"]),
-                "low": float(item["low"]),
-                "close": float(item["close"])
-            })
+            for item in reversed(data["values"]):
+                candles.append({
+                    "open": float(item["open"]),
+                    "high": float(item["high"]),
+                    "low": float(item["low"]),
+                    "close": float(item["close"])
+                })
 
-        analyses[label] = analyse_timeframe(candles)
-        analyses[label]["atr"] = round(calc_atr(candles), 2)
+            analyses[label] = analyse_timeframe(candles)
+            analyses[label]["atr"] = round(calc_atr(candles), 2)
 
         current_price = analyses["M5"]["price"]
 
