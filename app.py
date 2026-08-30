@@ -654,7 +654,7 @@ def gold_signal():
                 })
 
             analyses[label] = analyse_timeframe(candles)
-            analyses[label]["atr"] = round(calc_atr(candles)
+            analyses[label]["atr"] = round(calc_atr(candles), 2)
             current_price = analyses["M5"]["price"]        
  
             weighted_score = (
