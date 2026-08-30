@@ -652,8 +652,8 @@ def gold_signal():
                     "low": float(item["low"]),
                     "close": float(item["close"])
                 })
-                 analyses[label] = analyse_timeframe(candles)
-                 analyses[label]["atr"] = round(calc_atr(candles), 2)
+             analyses[label] = analyse_timeframe(candles)
+             analyses[label]["atr"] = round(calc_atr(candles), 2)
 
         current_price = analyses["M5"]["price"]
 
