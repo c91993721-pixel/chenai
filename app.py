@@ -513,7 +513,7 @@ def gold_mtf():
             "status": "error",
             "message": str(e)
         }), 500
-        def calc_ema(values, period):
+def calc_ema(values, period):
     multiplier = 2 / (period + 1)
     ema = values[0]
 
