@@ -51,6 +51,13 @@ def connected(client):
     print("SENDING APPLICATION AUTH", flush=True)
  
     deferred = client.send(request)
+        deferred.addCallback(
+        lambda response: print(
+            "APPLICATION AUTH RESPONSE:",
+            str(Protobuf.extract(response)),
+            flush=True
+        )
+    )
     deferred.addErrback(on_error)
 
 
