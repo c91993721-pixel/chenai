@@ -448,5 +448,71 @@ def gold_test():
             "status": "error",
             "message": str(e)
         }), 500
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+
+@app.route("/gold-mtf")
+def gold_mtf():
+    try:
+        api_key = os.environ.get("TWELVE_DATA_API_KEY")
+
+        if not api_key:
+            return jsonify({
+                "status": "error",
+                "message": "TWELVE_DATA_API_KEY missing"
+            }), 500
+
+        intervals = {
+            "M5": "5min",
+            "M15": "15min",
+            "H1": "1h"
+        }
+
+        result = {}
+
+        for label, interval in intervals.items():
+            response = requests.get(
+                "https://api.twelvedata.com/time_series",
+                params={
+                    "symbol": "XAU/USD",
+                    "interval": interval,
+                    "outputsize": 100,
+                    "apikey": api_key
+                },
+                timeout=15
+            )
+
+            data = response.json()
+
+            if "values" not in data:
+                return jsonify({
+                    "status": "error",
+                    "timeframe": label,
+                    "response": data
+                }), 500
+
+            candles = []
+
+            for item in reversed(data["values"]):
+                candles.append({
+                    "datetime": item["datetime"],
+                    "open": float(item["open"]),
+                    "high": float(item["high"]),
+                    "low": float(item["low"]),
+                    "close": float(item["close"])
+                })
+
+            result[label] = candles
+
+        return jsonify({
+            "status": "ok",
+            "symbol": "XAU/USD",
+            "timeframes": result
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+        if __name__ == "__main__":
+            app.run(host="0.0.0.0", port=10000)
+    
