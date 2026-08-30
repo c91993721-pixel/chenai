@@ -654,8 +654,9 @@ def gold_signal():
                 })
 
             analyses[label] = analyse_timeframe(candles)
+            analyses[label]["atr"] = round(calc_atr(candles), 2)
 
-        current_price = analyses["M5"]["price"]
+           currprice = analyses["M5"]["price"]
 
         weighted_score = (
             analyses["M5"]["score"] +
@@ -674,12 +675,36 @@ def gold_signal():
             100,
             round(abs(weighted_score) / 18 * 100)
         )
+        atr = analyses["M15"]["atr"]
+        entry = current_price
 
+        if final_signal == "BUY":
+            stop_loss = entry - (atr * 1.5)
+            tp1 = entry + (atr * 1.0)
+            tp2 = entry + (atr * 2.0)
+            tp3 = entry + (atr * 3.0)
+
+        elif final_signal == "SELL":
+            stop_loss = entry + (atr * 1.5)
+            tp1 = entry - (atr * 1.0)
+            tp2 = entry - (atr * 2.0)
+            tp3 = entry - (atr * 3.0)
+
+        else:
+            stop_loss = None
+            tp1 = None
+            tp2 = None
+            tp3 = None
         return jsonify({
             "status": "ok",
             "symbol": "XAU/USD",
             "price": current_price,
             "signal": final_signal,
+            "entry": round(entry, 2),
+            "stop_loss": round(stop_loss, 2) if stop_loss is not None else None,
+            "tp1": round(tp1, 2) if tp1 is not None else None,
+            "tp2": round(tp2, 2) if tp2 is not None else None,
+            "tp3": round(tp3, 2) if tp3 is not None else None,
             "confidence": confidence,
             "timeframes": analyses
         })
