@@ -513,6 +513,182 @@ def gold_mtf():
             "status": "error",
             "message": str(e)
         }), 500
-        if __name__ == "__main__":
+        def calc_ema(values, period):
+    multiplier = 2 / (period + 1)
+    ema = values[0]
+
+    for value in values[1:]:
+        ema = (value - ema) * multiplier + ema
+
+    return ema
+
+
+def calc_rsi(values, period=14):
+    if len(values) < period + 1:
+        return 50
+
+    gains = []
+    losses = []
+
+    for i in range(1, len(values)):
+        change = values[i] - values[i - 1]
+        gains.append(max(change, 0))
+        losses.append(max(-change, 0))
+
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+
+    if avg_loss == 0:
+        return 100
+
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+
+def calc_atr(candles, period=14):
+    true_ranges = []
+
+    for i in range(1, len(candles)):
+        high = candles[i]["high"]
+        low = candles[i]["low"]
+        previous_close = candles[i - 1]["close"]
+
+        true_range = max(
+            high - low,
+            abs(high - previous_close),
+            abs(low - previous_close)
+        )
+
+        true_ranges.append(true_range)
+
+    if not true_ranges:
+        return 0
+
+    return sum(true_ranges[-period:]) / min(period, len(true_ranges))
+
+
+def analyse_timeframe(candles):
+    closes = [candle["close"] for candle in candles]
+
+    price = closes[-1]
+    ema9 = calc_ema(closes, 9)
+    ema21 = calc_ema(closes, 21)
+    rsi = calc_rsi(closes)
+
+    score = 0
+
+    if price > ema9:
+        score += 1
+    else:
+        score -= 1
+
+    if ema9 > ema21:
+        score += 1
+    else:
+        score -= 1
+
+    if rsi >= 55:
+        score += 1
+    elif rsi <= 45:
+        score -= 1
+
+    if score >= 2:
+        signal = "BUY"
+    elif score <= -2:
+        signal = "SELL"
+    else:
+        signal = "WAIT"
+
+    return {
+        "signal": signal,
+        "score": score,
+        "price": round(price, 2),
+        "ema9": round(ema9, 2),
+        "ema21": round(ema21, 2),
+        "rsi": round(rsi, 2)
+    }
+
+
+@app.route("/gold-signal")
+def gold_signal():
+    try:
+        api_key = os.environ.get("TWELVE_DATA_API_KEY")
+
+        intervals = {
+            "M5": "5min",
+            "M15": "15min",
+            "H1": "1h"
+        }
+
+        analyses = {}
+
+        for label, interval in intervals.items():
+            response = requests.get(
+                "https://api.twelvedata.com/time_series",
+                params={
+                    "symbol": "XAU/USD",
+                    "interval": interval,
+                    "outputsize": 100,
+                    "apikey": api_key
+                },
+                timeout=15
+            )
+
+            data = response.json()
+
+            if "values" not in data:
+                return jsonify({
+                    "status": "error",
+                    "timeframe": label,
+                    "response": data
+                }), 500
+
+            candles = []
+
+            for item in reversed(data["values"]):
+                candles.append({
+                    "open": float(item["open"]),
+                    "high": float(item["high"]),
+                    "low": float(item["low"]),
+                    "close": float(item["close"])
+                })
+
+            analyses[label] = analyse_timeframe(candles)
+
+        current_price = analyses["M5"]["price"]
+
+        weighted_score = (
+            analyses["M5"]["score"] +
+            analyses["M15"]["score"] * 2 +
+            analyses["H1"]["score"] * 3
+        )
+
+        if weighted_score >= 6:
+            final_signal = "BUY"
+        elif weighted_score <= -6:
+            final_signal = "SELL"
+        else:
+            final_signal = "WAIT"
+
+        confidence = min(
+            100,
+            round(abs(weighted_score) / 18 * 100)
+        )
+
+        return jsonify({
+            "status": "ok",
+            "symbol": "XAU/USD",
+            "price": current_price,
+            "signal": final_signal,
+            "confidence": confidence,
+            "timeframes": analyses
+        })
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+if __name__ == "__main__":
             app.run(host="0.0.0.0", port=10000)
     
