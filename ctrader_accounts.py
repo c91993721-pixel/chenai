@@ -39,16 +39,14 @@ def on_error(failure):
         "status": "error",
         "message": str(failure)
     })
-
-
 def connected(client):
-    print("CONNECTED CALLBACK FIRED", flush=True)
+        print("CONNECTED CALLBACK FIRED", flush=True)
     
-    request = ProtoOAApplicationAuthReq()
-    request.clientId = CLIENT_ID
-    request.clientSecret = CLIENT_SECRET
+        request = ProtoOAApplicationAuthReq()
+        request.clientId = CLIENT_ID
+        request.clientSecret = CLIENT_SECRET
   
-    print("SENDING APPLICATION AUTH", flush=True)
+        print("SENDING APPLICATION AUTH", flush=True)
  
     
         deferred = client.send(request)
