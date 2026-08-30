@@ -32,6 +32,9 @@ def stop_with(data):
 
 
 def on_error(failure):
+    print("CTRADER SEND ERROR:", repr(failure.value), flush=True)
+    print(failure.getTraceback(), flush=True)
+    
     stop_with({
         "status": "error",
         "message": str(failure)
