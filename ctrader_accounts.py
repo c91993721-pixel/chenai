@@ -1,12 +1,13 @@
 import os
 import json
 
-from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPoints
-from ctrader_open_api.messages.OpenApiMessages_pb2 import (
+from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPointsfrom ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOAApplicationAuthReq,
     ProtoOAApplicationAuthRes,
     ProtoOAGetAccountListByAccessTokenReq,
     ProtoOAGetAccountListByAccessTokenRes,
+    ProtoOAAccountAuthReq,
+    ProtoOAAccountAuthRes,
 )
 from twisted.internet import reactor
 
@@ -97,11 +98,24 @@ def on_message(client, message):
                 "broker": getattr(account, "brokerTitleShort", "")
             })
 
+        selected_account = response.ctidTraderAccount[0]
+
+        auth_request = ProtoOAAccountAuthReq()
+        auth_request.ctidTraderAccountId = selected_account.ctidTraderAccountId
+        auth_request.accessToken = ACCESS_TOKEN
+
+        deferred = client.send(auth_request)
+        deferred.addErrback(on_error)
+    
+    if message.payloadType == ProtoOAAccountAuthRes().payloadType:
+        response = Protobuf.extract(message)
+
         stop_with({
             "status": "ok",
-            "accounts": accounts
+            "stage": "account_auth",
+            "ctidTraderAccountId": response.ctidTraderAccountId,
+            "message": "cTrader Demo Account Auth OK"
         })
-
 
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
