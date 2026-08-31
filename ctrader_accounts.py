@@ -59,11 +59,7 @@ def connected(client):
     
 
 def disconnected(client, reason):
-    stop_with({
-        "status": "error",
-        "stage": "disconnected",
-        "message": str(reason)
-    })
+    return
 
     
 
