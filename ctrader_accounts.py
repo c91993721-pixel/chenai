@@ -73,11 +73,11 @@ def on_message(client, message):
         flush=True
     )
     if message.payloadType == ProtoOAApplicationAuthRes().payloadType:
-    stop_with({
-        "status": "ok",
-        "stage": "application_auth",
-        "message": "cTrader Application Auth 成功"
-    })
+        stop_with({
+            "status": "ok",
+            "stage": "application_auth",
+            "message": "cTrader Application Auth OK"
+        })
 
     if message.payloadType == ProtoOAGetAccountListByAccessTokenRes().payloadType:
 
