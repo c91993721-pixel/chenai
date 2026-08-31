@@ -1,7 +1,9 @@
 import os
 import json
 
-from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPointsfrom ctrader_open_api.messages.OpenApiMessages_pb2 import (
+from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPoints
+
+from ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOAApplicationAuthReq,
     ProtoOAApplicationAuthRes,
     ProtoOAGetAccountListByAccessTokenReq,
