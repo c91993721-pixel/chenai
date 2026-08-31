@@ -79,7 +79,7 @@ if message.payloadType == ProtoOAApplicationAuthRes().payloadType:
         "message": "cTrader Application Auth 成功"
     })
 
-    elif message.payloadType == ProtoOAGetAccountListByAccessTokenRes().payloadType:
+if message.payloadType == ProtoOAGetAccountListByAccessTokenRes().payloadType:
 
         response = Protobuf.extract(message)
 
