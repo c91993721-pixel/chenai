@@ -98,7 +98,7 @@ def on_message(client, message):
                 "ctidTraderAccountId": account.ctidTraderAccountId,
                 "traderLogin": account.traderLogin,
                 "isLive": account.isLive,
-                "broker": account.brokerTitleShort
+                "broker": getattr(account, "brokerTitleShort", "")
             })
 
         stop_with({
