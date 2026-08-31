@@ -22,10 +22,15 @@ client = Client(
     TcpProtocol
 )
 
+finished = False
 
+finished = False
 
 def stop_with(data):
-    print(json.dumps(data, ensure_ascii=False))
+    global finished
+    finished = True
+
+    print(json.dumps(data, ensure_ascii=False), flush=True)
 
     if reactor.running:
         reactor.stop()
