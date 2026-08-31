@@ -72,13 +72,12 @@ def on_message(client, message):
         str(extracted),
         flush=True
     )
-    if message.payloadType == ProtoOAApplicationAuthRes().payloadType:
-
-        request = ProtoOAGetAccountListByAccessTokenReq()
-        request.accessToken = ACCESS_TOKEN
-
-        deferred = client.send(request)
-        deferred.addErrback(on_error)
+if message.payloadType == ProtoOAApplicationAuthRes().payloadType:
+    stop_with({
+        "status": "ok",
+        "stage": "application_auth",
+        "message": "cTrader Application Auth 成功"
+    })
 
     elif message.payloadType == ProtoOAGetAccountListByAccessTokenRes().payloadType:
 
