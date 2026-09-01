@@ -10,6 +10,8 @@ from ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOAGetAccountListByAccessTokenRes,
     ProtoOAAccountAuthReq,
     ProtoOAAccountAuthRes,
+    ProtoOASymbolsListReq,
+    ProtoOASymbolsListRes,
 )
 from twisted.internet import reactor
 
@@ -27,7 +29,7 @@ client = Client(
 
 finished = False
 
-finished = False
+
 
 def stop_with(data):
     global finished
@@ -110,15 +112,32 @@ def on_message(client, message):
         deferred.addErrback(on_error)
     
     if message.payloadType == ProtoOAAccountAuthRes().payloadType:
+        response = Protobuf.extract(message) 
+        
+        symbols_request = ProtoOASymbolsListReq()
+        symbols_request.ctidTraderAccountId = response.ctidTraderAccountId
+        symbols_request.includeArchivedSymbols = False
+
+        deferred = client.send(symbols_request)
+        deferred.addErrback(on_error)
+    if message.payloadType == ProtoOASymbolsListRes().payloadType:
         response = Protobuf.extract(message)
+
+        xauusd = []
+
+        for symbol in response.symbol:
+            symbol_name = getattr(symbol, "symbolName", "")
+            if "XAUUSD" in symbol_name.upper():
+                xauusd.append({
+                    "symbolId": symbol.symbolId,
+                    "symbolName": symbol_name
+                })
 
         stop_with({
             "status": "ok",
-            "stage": "account_auth",
-            "ctidTraderAccountId": response.ctidTraderAccountId,
-            "message": "cTrader Demo Account Auth OK"
+            "stage": "symbols",
+            "xauusd": xauusd
         })
-
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
         "status": "error",
