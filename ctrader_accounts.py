@@ -116,7 +116,17 @@ def on_message(client, message):
 
         deferred = client.send(auth_request)
         deferred.addErrback(on_error)
+        
+    if message.payloadType == ProtoOAAccountAuthRes().payloadType:
+        response = Protobuf.extract(message)
 
+        symbols_request = ProtoOASymbolsListReq()
+        symbols_request.ctidTraderAccountId = response.ctidTraderAccountId
+        symbols_request.includeArchivedSymbols = False
+
+        deferred = client.send(symbols_request)
+        deferred.addErrback(on_error)
+        
     if message.payloadType == ProtoOASymbolsListRes().payloadType:
         response = Protobuf.extract(message)
 
