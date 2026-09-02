@@ -139,16 +139,16 @@ def on_message(client, message):
                 deferred = client.send(spot_request)
                 deferred.addErrback(on_error)
 
-            trend_request = ProtoOAGetTrendbarsReq()
-            trend_request.ctidTraderAccountId = response.ctidTraderAccountId
-            trend_request.symbolId = xauusd[0]["symbolId"]
-            trend_request.period = ProtoOATrendbarPeriod.Value("M5")
-            trend_request.count = 100
-            trend_request.toTimestamp = int(time.time() * 1000)
-            trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
+                trend_request = ProtoOAGetTrendbarsReq()
+                trend_request.ctidTraderAccountId = response.ctidTraderAccountId
+                trend_request.symbolId = xauusd[0]["symbolId"]
+                trend_request.period = ProtoOATrendbarPeriod.Value("M5")
+                trend_request.count = 100
+                trend_request.toTimestamp = int(time.time() * 1000)
+                trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
 
-            deferred = client.send(trend_request)
-            deferred.addErrback(on_error)
+                deferred = client.send(trend_request)
+                deferred.addErrback(on_error)
 
         
             else:
