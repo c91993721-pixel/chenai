@@ -14,7 +14,10 @@ from ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOASymbolsListRes,
     ProtoOASubscribeSpotsReq,
     ProtoOASpotEvent,
+    ProtoOAGetTrendbarsReq,
+    ProtoOAGetTrendbarsRes,
 )
+from ctrader_open_api.messages.OpenApiModelMessages_pb2 import ProtoOATrendbarPeriod
 from twisted.internet import reactor
 
 
@@ -154,16 +157,24 @@ def on_message(client, message):
 
         bid = spot.bid / 100000 if getattr(spot, "bid", 0) else None
         ask = spot.ask / 100000 if getattr(spot, "ask", 0) else None
+        trend_request = ProtoOAGetTrendbarsReq()
+        trend_request.ctidTraderAccountId = spot.ctidTraderAccountId
+        trend_request.symbolId = spot.symbolId
+        trend_request.period = ProtoOATrendbarPeriod.Value("M5")
+        trend_request.count = 100
+
+        deferred = client.send(trend_request)
+        deferred.addErrback(on_error)
+        
+    if message.payloadType == ProtoOAGetTrendbarsRes().payloadType:
+        response = Protobuf.extract(message)
 
         stop_with({
             "status": "ok",
-            "stage": "spot",
-            "symbolId": spot.symbolId,
-            "symbol": "XAUUSD",
-            "bid": bid,
-            "ask": ask
+            "stage": "trendbars",
+            "count": len(response.trendbar)
         })
-    
+
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
         "status": "error",
