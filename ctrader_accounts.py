@@ -190,11 +190,37 @@ def on_message(client, message):
                 "low": low,
                 "close": close
             })
+        closes = [bar["close"] for bar in bars]
 
+        def ema(values, period):
+            multiplier = 2 / (period + 1)
+            result = values[0]
+
+            for value in values[1:]:
+                result = (value - result) * multiplier + result
+
+            return round(result, 2)
+
+        ema9 = ema(closes, 9)
+        ema21 = ema(closes, 21)
+        ema50 = ema(closes, 50)
+
+        if ema9 > ema21 > ema50:
+            signal = "LONG"
+        elif ema9 < ema21 < ema50:
+            signal = "SHORT"
+        else:
+            signal = "WAIT"
         stop_with({
             "status": "ok",
-            "stage": "trendbars",
+            "stage": "signal",
+            "timeframe": "M5",
             "count": len(bars),
+            "ema9": ema9,
+            "ema21": ema21,
+            "ema50": ema50,
+            "signal": signal,
+            "lastClose": bars[-1]["close"],
             "bars": bars[-5:]
         })
 
