@@ -116,16 +116,7 @@ def on_message(client, message):
 
         deferred = client.send(auth_request)
         deferred.addErrback(on_error)
-    
-    if message.payloadType == ProtoOAAccountAuthRes().payloadType:
-        response = Protobuf.extract(message) 
-        
-        symbols_request = ProtoOASymbolsListReq()
-        symbols_request.ctidTraderAccountId = response.ctidTraderAccountId
-        symbols_request.includeArchivedSymbols = False
 
-        deferred = client.send(symbols_request)
-        deferred.addErrback(on_error)
     if message.payloadType == ProtoOASymbolsListRes().payloadType:
         response = Protobuf.extract(message)
 
@@ -147,6 +138,19 @@ def on_message(client, message):
 
                 deferred = client.send(spot_request)
                 deferred.addErrback(on_error)
+
+            trend_request = ProtoOAGetTrendbarsReq()
+            trend_request.ctidTraderAccountId = response.ctidTraderAccountId
+            trend_request.symbolId = xauusd[0]["symbolId"]
+            trend_request.period = ProtoOATrendbarPeriod.Value("M5")
+            trend_request.count = 100
+            trend_request.toTimestamp = int(time.time() * 1000)
+            trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
+
+            deferred = client.send(trend_request)
+            deferred.addErrback(on_error)
+
+        
             else:
                 stop_with({
                    "status": "error",
@@ -158,17 +162,6 @@ def on_message(client, message):
 
         bid = spot.bid / 100000 if getattr(spot, "bid", 0) else None
         ask = spot.ask / 100000 if getattr(spot, "ask", 0) else None
-        trend_request = ProtoOAGetTrendbarsReq()
-        trend_request.ctidTraderAccountId = spot.ctidTraderAccountId
-        trend_request.symbolId = spot.symbolId
-        trend_request.period = ProtoOATrendbarPeriod.Value("M5")
-        trend_request.count = 100
-        trend_request.toTimestamp = int(time.time() * 1000)
-        trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
-
-        
-        deferred = client.send(trend_request)
-        deferred.addErrback(on_error)
         
     if message.payloadType == ProtoOAGetTrendbarsRes().payloadType:
         response = Protobuf.extract(message)
