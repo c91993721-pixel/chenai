@@ -12,6 +12,8 @@ from ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOAAccountAuthRes,
     ProtoOASymbolsListReq,
     ProtoOASymbolsListRes,
+    ProtoOASubscribeSpotsReq,
+    ProtoOASpotEvent,
 )
 from twisted.internet import reactor
 
