@@ -204,25 +204,49 @@ def on_message(client, message):
         ema9 = ema(closes, 9)
         ema21 = ema(closes, 21)
         ema50 = ema(closes, 50)
+def rsi(values, period=14):
+    gains = []
+    losses = []
 
-        if ema9 > ema21 > ema50:
-            signal = "LONG"
-        elif ema9 < ema21 < ema50:
-            signal = "SHORT"
+    for i in range(1, len(values)):
+        change = values[i] - values[i - 1]
+
+        if change > 0:
+            gains.append(change)
+            losses.append(0)
         else:
-            signal = "WAIT"
-        stop_with({
-            "status": "ok",
-            "stage": "signal",
-            "timeframe": "M5",
-            "count": len(bars),
-            "ema9": ema9,
-            "ema21": ema21,
-            "ema50": ema50,
-            "signal": signal,
-            "lastClose": bars[-1]["close"],
-            "bars": bars[-5:]
-        })
+            gains.append(0)
+            losses.append(abs(change))
+
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+
+    if avg_loss == 0:
+        return 100
+
+    rs = avg_gain / avg_loss
+    return round(100 - (100 / (1 + rs)), 2)
+
+rsi14 = rsi(closes, 14)
+if ema9 > ema21 > ema50:
+            signal = "LONG"
+elif ema9 < ema21 < ema50:
+    signal = "SHORT"
+else:
+    signal = "WAIT"
+stop_with({
+    "status": "ok",
+    "stage": "signal",
+    "timeframe": "M5",
+    "count": len(bars),
+    "ema9": ema9,
+    "ema21": ema21,
+    "ema50": ema50, 
+    "rsi14": rsi14,
+    "signal": signal,
+    "lastClose": bars[-1]["close"],
+    "bars": bars[-5:]
+ })
 
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
