@@ -136,12 +136,12 @@ def on_message(client, message):
                 })
 
             if xauusd:
-            spot_request = ProtoOASubscribeSpotsReq()
-            spot_request.ctidTraderAccountId = response.ctidTraderAccountId
-            spot_request.symbolId.append(xauusd[0]["symbolId"])
+                spot_request = ProtoOASubscribeSpotsReq()
+                spot_request.ctidTraderAccountId = response.ctidTraderAccountId
+                spot_request.symbolId.append(xauusd[0]["symbolId"])
 
-            deferred = client.send(spot_request)
-            deferred.addErrback(on_error)
+                deferred = client.send(spot_request)
+                deferred.addErrback(on_error)
             else:
                stop_with({
                    "status": "error",
