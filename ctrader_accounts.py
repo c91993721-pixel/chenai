@@ -146,7 +146,7 @@ def on_message(client, message):
                stop_with({
                    "status": "error",
                    "stage": "symbols",
-                   "message": "XAUUSD not 
+                   "message": "XAUUSD not found"
                }) 
     if message.payloadType == ProtoOASpotEvent().payloadType:
         spot = Protobuf.extract(message)
