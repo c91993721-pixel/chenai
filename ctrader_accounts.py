@@ -164,7 +164,9 @@ def on_message(client, message):
         trend_request.period = ProtoOATrendbarPeriod.Value("M5")
         trend_request.count = 100
         trend_request.toTimestamp = int(time.time() * 1000)
+        trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
 
+        
         deferred = client.send(trend_request)
         deferred.addErrback(on_error)
         
