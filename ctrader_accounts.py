@@ -134,7 +134,8 @@ def on_message(client, message):
                     "symbolId": symbol.symbolId,
                     "symbolName": symbol_name
                 })
-
+            if not xauusd:
+                xauusd = [{"symbolId": 41, "symbolName": "XAUUSD"}]
             if xauusd:
                 spot_request = ProtoOASubscribeSpotsReq()
                 spot_request.ctidTraderAccountId = response.ctidTraderAccountId
@@ -143,11 +144,11 @@ def on_message(client, message):
                 deferred = client.send(spot_request)
                 deferred.addErrback(on_error)
             else:
-               stop_with({
+                stop_with({
                    "status": "error",
                    "stage": "symbols",
                    "message": "XAUUSD not found"
-               }) 
+                }) 
     if message.payloadType == ProtoOASpotEvent().payloadType:
         spot = Protobuf.extract(message)
 
