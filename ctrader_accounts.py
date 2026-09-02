@@ -172,14 +172,30 @@ def on_message(client, message):
 
         bid = spot.bid / 100000 if getattr(spot, "bid", 0) else None
         ask = spot.ask / 100000 if getattr(spot, "ask", 0) else None
-        
     if message.payloadType == ProtoOAGetTrendbarsRes().payloadType:
         response = Protobuf.extract(message)
+
+        bars = []
+
+        for bar in response.trendbar:
+            low = bar.low / 100000
+            open_price = (bar.low + bar.deltaOpen) / 100000
+            high = (bar.low + bar.deltaHigh) / 100000
+            close = (bar.low + bar.deltaClose) / 100000
+
+            bars.append({
+                "timestamp": bar.utcTimestampInMinutes,
+                "open": open_price,
+                "high": high,
+                "low": low,
+                "close": close
+            })
 
         stop_with({
             "status": "ok",
             "stage": "trendbars",
-            "count": len(response.trendbar)
+            "count": len(bars),
+            "bars": bars[-5:]
         })
 
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
