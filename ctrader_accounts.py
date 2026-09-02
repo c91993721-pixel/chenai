@@ -1,5 +1,6 @@
 import os
 import json
+import time
 
 from ctrader_open_api import Client, Protobuf, TcpProtocol, EndPoints
 
@@ -162,6 +163,7 @@ def on_message(client, message):
         trend_request.symbolId = spot.symbolId
         trend_request.period = ProtoOATrendbarPeriod.Value("M5")
         trend_request.count = 100
+        trend_request.toTimestamp = int(time.time() * 1000)
 
         deferred = client.send(trend_request)
         deferred.addErrback(on_error)
