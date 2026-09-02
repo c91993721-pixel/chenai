@@ -227,7 +227,7 @@ def on_message(client, message):
             rs = avg_gain / avg_loss
             return round(100 - (100 / (1 + rs)), 2)
 
-               rsi14 = rsi(closes, 14)
+        rsi14 = rsi(closes, 14)
 
         if ema9 > ema21 > ema50:
             signal = "LONG"
