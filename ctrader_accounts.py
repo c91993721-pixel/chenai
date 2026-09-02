@@ -204,36 +204,37 @@ def on_message(client, message):
         ema9 = ema(closes, 9)
         ema21 = ema(closes, 21)
         ema50 = ema(closes, 50)
-def rsi(values, period=14):
-    gains = []
-    losses = []
+        def rsi(values, period=14):
+            gains = []
+            losses = []
 
-    for i in range(1, len(values)):
-        change = values[i] - values[i - 1]
+            for i in range(1, len(values)):
+                change = values[i] - values[i - 1]
 
-        if change > 0:
-            gains.append(change)
-            losses.append(0)
-        else:
-            gains.append(0)
-            losses.append(abs(change))
+                if change > 0:
+                    gains.append(change)
+                    losses.append(0)
+                else:
+                    gains.append(0)
+                    losses.append(abs(change))
 
-    avg_gain = sum(gains[-period:]) / period
-    avg_loss = sum(losses[-period:]) / period
+            avg_gain = sum(gains[-period:]) / period
+            avg_loss = sum(losses[-period:]) / period
 
-    if avg_loss == 0:
-        return 100
+            if avg_loss == 0:
+                return 100
 
-    rs = avg_gain / avg_loss
-    return round(100 - (100 / (1 + rs)), 2)
+            rs = avg_gain / avg_loss
+            return round(100 - (100 / (1 + rs)), 2)
 
-rsi14 = rsi(closes, 14)
-if ema9 > ema21 > ema50:
+               rsi14 = rsi(closes, 14)
+
+        if ema9 > ema21 > ema50:
             signal = "LONG"
-elif ema9 < ema21 < ema50:
-    signal = "SHORT"
-else:
-    signal = "WAIT"
+        elif ema9 < ema21 < ema50:
+            signal = "SHORT"
+        else:
+            signal = "WAIT"  
 stop_with({
     "status": "ok",
     "stage": "signal",
