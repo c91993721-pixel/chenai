@@ -135,11 +135,34 @@ def on_message(client, message):
                     "symbolName": symbol_name
                 })
 
+            if xauusd:
+            spot_request = ProtoOASubscribeSpotsReq()
+            spot_request.ctidTraderAccountId = response.ctidTraderAccountId
+            spot_request.symbolId.append(xauusd[0]["symbolId"])
+
+            deferred = client.send(spot_request)
+            deferred.addErrback(on_error)
+            else:
+               stop_with({
+                   "status": "error",
+                   "stage": "symbols",
+                   "message": "XAUUSD not 
+               }) 
+    if message.payloadType == ProtoOASpotEvent().payloadType:
+        spot = Protobuf.extract(message)
+
+        bid = spot.bid / 100000 if getattr(spot, "bid", 0) else None
+        ask = spot.ask / 100000 if getattr(spot, "ask", 0) else None
+
         stop_with({
             "status": "ok",
-            "stage": "symbols",
-            "xauusd": xauusd
+            "stage": "spot",
+            "symbolId": spot.symbolId,
+            "symbol": "XAUUSD",
+            "bid": bid,
+            "ask": ask
         })
+    
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
         "status": "error",
