@@ -228,13 +228,13 @@ def on_message(client, message):
             return round(100 - (100 / (1 + rs)), 2)
 
         rsi14 = rsi(closes, 14)
-
-        if ema9 > ema21 > ema50:
-            signal = "LONG"
-        elif ema9 < ema21 < ema50:
-            signal = "SHORT"
-        else:
-            signal = "WAIT"  
+        
+            if ema9 > ema21 > ema50 and rsi14 > 55:
+                signal = "LONG"
+            elif ema9 < ema21 < ema50 and rsi14 < 45:
+                signal = "SHORT"
+            else:
+ㄙˉ              signal = "WAIT" 
         stop_with({
             "status": "ok",
             "stage": "signal",
