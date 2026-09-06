@@ -227,7 +227,7 @@ def on_message(client, message):
             rs = avg_gain / avg_loss
             return round(100 - (100 / (1 + rs)), 2)
             
-            def rsi(values, period=14):
+        
         
             rsi14 = rsi(closes, 14)
 
@@ -237,10 +237,19 @@ def on_message(client, message):
                 signal = "SHORT"
             else:
                 signal = "WAIT"
-
-            stop_with({
-        
-            })
+    stop_with({
+        "status": "ok",
+        "stage": "signal",
+        "timeframe": "M5",
+        "count": len(bars),
+        "ema9": ema9,
+        "ema21": ema21,
+        "ema50": ema50,
+        "rsi14": rsi14,
+        "signal": signal,
+        "lastClose": bars[-1]["close"],
+        "bars": bars[-5:]
+    })
 
 if not CLIENT_ID or not CLIENT_SECRET or not ACCESS_TOKEN:
     stop_with({
