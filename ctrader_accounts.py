@@ -227,8 +227,8 @@ def on_message(client, message):
             rs = avg_gain / avg_loss
             return round(100 - (100 / (1 + rs)), 2)
             
-       def atr(bars, period=14):
-           true_ranges = []
+           def atr(bars, period=14):
+               true_ranges = []
 
            for i in range(1, len(bars)):
                high = bars[i]["high"]
