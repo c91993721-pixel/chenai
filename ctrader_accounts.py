@@ -227,25 +227,25 @@ def on_message(client, message):
             rs = avg_gain / avg_loss
             return round(100 - (100 / (1 + rs)), 2)
             
-           def atr(bars, period=14):
-               true_ranges = []
+            def atr(bars, period=14):
+                true_ranges = []
 
-           for i in range(1, len(bars)):
-               high = bars[i]["high"]
-               low = bars[i]["low"]
-               prev_close = bars[i - 1]["close"]
+                for i in range(1, len(bars)):
+                    high = bars[i]["high"]
+                    low = bars[i]["low"]
+                    prev_close = bars[i - 1]["close"]
 
-               tr = max(
-                   high - low,
-                   abs(high - prev_close),
-                   abs(low - prev_close)
-               )
+                    tr = max(
+                        high - low,
+                        abs(high - prev_close),
+                        abs(low - prev_close)
+                    )
 
-               true_ranges.append(tr)
+                    true_ranges.append(tr)
 
-           return round(sum(true_ranges[-period:]) / period, 2)
+                return round(sum(true_ranges[-period:]) / period, 2)
 
-       atr14 = atr(bars, 14)
+            atr14 = atr(bars, 14)
         
         rsi14 = rsi(closes, 14)
 
