@@ -227,7 +227,25 @@ def on_message(client, message):
             rs = avg_gain / avg_loss
             return round(100 - (100 / (1 + rs)), 2)
             
-        
+       def atr(bars, period=14):
+           true_ranges = []
+
+           for i in range(1, len(bars)):
+               high = bars[i]["high"]
+               low = bars[i]["low"]
+               prev_close = bars[i - 1]["close"]
+
+               tr = max(
+                   high - low,
+                   abs(high - prev_close),
+                   abs(low - prev_close)
+               )
+
+               true_ranges.append(tr)
+
+           return round(sum(true_ranges[-period:]) / period, 2)
+
+       atr14 = atr(bars, 14)
         
         rsi14 = rsi(closes, 14)
 
@@ -237,6 +255,17 @@ def on_message(client, message):
               signal = "SHORT"
         else:
               signal = "WAIT"
+        entry = bars[-1]["close"]
+        stop_loss = None
+        take_profit = None
+
+        if signal == "LONG":
+             stop_loss = round(entry - (atr14 * 1.5), 2)
+             take_profit = round(entry + (atr14 * 3), 2)
+
+        elif signal == "SHORT":
+            stop_loss = round(entry + (atr14 * 1.5), 2)
+            take_profit = round(entry - (atr14 * 3), 2)
         stop_with({
                 "status": "ok",
                 "stage": "signal",
@@ -246,6 +275,10 @@ def on_message(client, message):
                 "ema21": ema21,
                 "ema50": ema50,
                 "rsi14": rsi14,
+                "atr14": atr14,
+                "entry": entry,
+                "stopLoss": stop_loss,
+                "takeProfit": take_profit,
                 "signal": signal,
                 "lastClose": bars[-1]["close"],
                 "bars": bars[-5:]
