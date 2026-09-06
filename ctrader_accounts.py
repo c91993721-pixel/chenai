@@ -89,7 +89,7 @@ def on_message(client, message):
         account_request = ProtoOAGetAccountListByAccessTokenReq()
         account_request.accessToken = ACCESS_TOKEN
 
-        deferred = client.send(account_request)
+        deferred = client.send(account_request, responseTimeoutInSeconds=15)
         deferred.addErrback(on_error)
 
 
