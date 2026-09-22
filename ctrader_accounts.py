@@ -124,7 +124,7 @@ def on_message(client, message):
         symbols_request.ctidTraderAccountId = response.ctidTraderAccountId
         symbols_request.includeArchivedSymbols = False
 
-        deferred = client.send(symbols_request)
+        client.send(symbols_request)
         deferred.addErrback(on_error)
         
     if message.payloadType == ProtoOASymbolsListRes().payloadType:
@@ -146,7 +146,7 @@ def on_message(client, message):
                 spot_request.ctidTraderAccountId = response.ctidTraderAccountId
                 spot_request.symbolId.append(xauusd[0]["symbolId"])
 
-                deferred = client.send(spot_request)
+                client.send(spot_request)
                 deferred.addErrback(on_error)
 
                 trend_request = ProtoOAGetTrendbarsReq()
@@ -157,7 +157,7 @@ def on_message(client, message):
                 trend_request.toTimestamp = int(time.time() * 1000)
                 trend_request.fromTimestamp = int((time.time() - 2 * 24 * 60 * 60) * 1000)
 
-                deferred = client.send(trend_request)
+                client.send(trend_request)
                 deferred.addErrback(on_error)
 
         
